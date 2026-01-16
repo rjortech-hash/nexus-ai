@@ -15,6 +15,16 @@ interface Analytics {
   lastWeekMessages: number
 }
 
+interface Conversation {
+  id: string
+  user_id: string
+  expert_id: string
+  title: string
+  messages: any[]
+  created_at: string
+  updated_at: string
+}
+
 const experts = [
   { id: 'therapist', name: 'Dr. Sarah Chen', avatar: '🧠' },
   { id: 'business', name: 'Marcus Reid', avatar: '💼' },
@@ -53,54 +63,77 @@ export default function AnalyticsPage() {
   const loadAnalytics = async (userId: string) => {
     setLoading(true)
 
-    // Get conversations
-    const { data: conversations } = await supabase
-      .from('conversations')
-      .select('*')
-      .eq('user_id', userId)
+    try {
+      // Get conversations with proper typing
+      const { data: conversations, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('user_id', userId)
 
-    if (conversations) {
-      // Calculate total messages
-      const totalMessages = conversations.reduce((sum, conv) => sum + (conv.messages?.length || 0), 0)
+      if (error) {
+        console.error('Error loading analytics:', error)
+        setLoading(false)
+        return
+      }
 
-      // Calculate expert usage
-      const usage: Record<string, number> = {}
-      conversations.forEach(conv => {
-        usage[conv.expert_id] = (usage[conv.expert_id] || 0) + 1
-      })
+      // Type cast conversations
+      const typedConversations = (conversations || []) as Conversation[]
 
-      // Find favorite expert
-      const favoriteExpert = Object.entries(usage).sort((a, b) => b[1] - a[1])[0]?.[0] || 'therapist'
+      if (typedConversations.length > 0) {
+        // Calculate total messages
+        const totalMessages = typedConversations.reduce((sum, conv) => {
+          const messageCount = Array.isArray(conv.messages) ? conv.messages.length : 0
+          return sum + messageCount
+        }, 0)
 
-      // Calculate this week vs last week
-      const oneWeekAgo = new Date()
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-      const twoWeeksAgo = new Date()
-      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
+        // Calculate expert usage
+        const usage: Record<string, number> = {}
+        typedConversations.forEach(conv => {
+          usage[conv.expert_id] = (usage[conv.expert_id] || 0) + 1
+        })
 
-      const thisWeekConvs = conversations.filter(c => new Date(c.updated_at) > oneWeekAgo)
-      const lastWeekConvs = conversations.filter(c => 
-        new Date(c.updated_at) > twoWeeksAgo && new Date(c.updated_at) <= oneWeekAgo
-      )
+        // Find favorite expert
+        const favoriteExpert = Object.entries(usage).sort((a, b) => b[1] - a[1])[0]?.[0] || 'therapist'
 
-      const thisWeekMessages = thisWeekConvs.reduce((sum, c) => sum + (c.messages?.length || 0), 0)
-      const lastWeekMessages = lastWeekConvs.reduce((sum, c) => sum + (c.messages?.length || 0), 0)
+        // Calculate this week vs last week
+        const oneWeekAgo = new Date()
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+        const twoWeeksAgo = new Date()
+        twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
 
-      // Calculate streak (simplified - counts days with activity)
-      const activityDates = conversations
-        .map(c => new Date(c.updated_at).toDateString())
-        .filter((date, i, arr) => arr.indexOf(date) === i)
-      
-      setAnalytics({
-        totalConversations: conversations.length,
-        totalMessages,
-        favoriteExpert,
-        streakDays: activityDates.length,
-        thisWeekMessages,
-        lastWeekMessages,
-      })
+        const thisWeekConvs = typedConversations.filter(c => new Date(c.updated_at) > oneWeekAgo)
+        const lastWeekConvs = typedConversations.filter(c => 
+          new Date(c.updated_at) > twoWeeksAgo && new Date(c.updated_at) <= oneWeekAgo
+        )
 
-      setExpertUsage(usage)
+        const thisWeekMessages = thisWeekConvs.reduce((sum, c) => {
+          const messageCount = Array.isArray(c.messages) ? c.messages.length : 0
+          return sum + messageCount
+        }, 0)
+
+        const lastWeekMessages = lastWeekConvs.reduce((sum, c) => {
+          const messageCount = Array.isArray(c.messages) ? c.messages.length : 0
+          return sum + messageCount
+        }, 0)
+
+        // Calculate streak (simplified - counts days with activity)
+        const activityDates = typedConversations
+          .map(c => new Date(c.updated_at).toDateString())
+          .filter((date, i, arr) => arr.indexOf(date) === i)
+        
+        setAnalytics({
+          totalConversations: typedConversations.length,
+          totalMessages,
+          favoriteExpert,
+          streakDays: activityDates.length,
+          thisWeekMessages,
+          lastWeekMessages,
+        })
+
+        setExpertUsage(usage)
+      }
+    } catch (error) {
+      console.error('Error in loadAnalytics:', error)
     }
 
     setLoading(false)
@@ -201,7 +234,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="h-2 bg-white/5 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                      className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
