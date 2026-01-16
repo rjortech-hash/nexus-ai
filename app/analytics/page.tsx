@@ -76,11 +76,11 @@ export default function AnalyticsPage() {
         return
       }
 
-      // Type cast conversations
+      // Type cast conversations to our interface
       const typedConversations = (conversations || []) as Conversation[]
 
       if (typedConversations.length > 0) {
-        // Calculate total messages
+        // Calculate total messages with proper type checking
         const totalMessages = typedConversations.reduce((sum, conv) => {
           const messageCount = Array.isArray(conv.messages) ? conv.messages.length : 0
           return sum + messageCount
