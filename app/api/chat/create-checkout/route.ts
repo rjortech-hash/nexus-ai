@@ -4,7 +4,7 @@ import { createSupabaseServerClient } from '@/lib/supabase'
 
 // Use default API version from installed Stripe package
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover',
+  apiVersion: '2022-11-15',
 })
 
 export async function POST(req: NextRequest) {
@@ -58,10 +58,10 @@ export async function POST(req: NextRequest) {
 
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      line_items: [
-        {
-          price: priceId,
+     customer: customerId,
+     line_items: [
+       {
+         price: priceId,
           quantity: 1,
         },
       ],
