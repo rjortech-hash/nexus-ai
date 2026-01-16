@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Brain, Sparkles, Shield, Users, ArrowRight, Star } from 'lucide-react'
 import Link from 'next/link'
 

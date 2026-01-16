@@ -1,5 +1,5 @@
-import { createBrowserClient } from '@supabase/ssr'
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient, createServerClient } from '@supabase/ssr' 
+import type { Database } from './types' // adjust path if needed
 
 export type Database = {
   public: {
@@ -45,28 +45,6 @@ export type Database = {
           messages?: any[]
         }
       }
-      user_preferences: {
-        Row: {
-          id: string
-          user_id: string
-          theme: string
-          notifications_enabled: boolean
-          favorite_experts: string[]
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          user_id: string
-          theme?: string
-          notifications_enabled?: boolean
-          favorite_experts?: string[]
-        }
-        Update: {
-          theme?: string
-          notifications_enabled?: boolean
-          favorite_experts?: string[]
-        }
-      }
       goals: {
         Row: {
           id: string
@@ -95,68 +73,31 @@ export type Database = {
           target_date?: string | null
         }
       }
-      usage_analytics: {
-        Row: {
-          id: string
-          user_id: string
-          event_type: string
-          event_data: any
-          created_at: string
-        }
-        Insert: {
-          user_id: string
-          event_type: string
-          event_data?: any
-        }
-        Update: {
-          event_type?: string
-          event_data?: any
-        }
-      }
-      subscriptions: {
-        Row: {
-          id: string
-          user_id: string
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
-          plan_id: string | null
-          status: string | null
-          current_period_end: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          user_id: string
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          plan_id?: string | null
-          status?: string | null
-          current_period_end?: string | null
-        }
-        Update: {
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          plan_id?: string | null
-          status?: string | null
-          current_period_end?: string | null
-        }
-      }
     }
   }
 }
 
-// Client-side Supabase client (for use in React components)
-export function createSupabaseClient() {
-  return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+// Client-side Supabase client
+export const createSupabaseClient = () => {
+  return createBrowserClient<Database>( 
+    process.env.NEXT_PUBLIC_SUPABASE_URL!, 
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-}
-
-// Server-side Supabase client (for API routes)
-export function createSupabaseServerClient() {
-  return createClient<Database>(
+   ) 
+  } 
+  
+// Server-side Supabase client (API routes, server components)
+ export const createSupabaseServerClient = () => {
+  const cookieStore = cookies()
+  
+  return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+     { 
+      cookies: {
+        get(name: string) {
+           return cookieStore.get(name)?.value 
+        } 
+      } 
+    } 
+  ) 
 }

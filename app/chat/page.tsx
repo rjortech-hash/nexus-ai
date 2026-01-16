@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { createSupabaseClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
+
 interface Message {
   role: 'user' | 'assistant'
   content: string
