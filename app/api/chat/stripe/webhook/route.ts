@@ -52,8 +52,12 @@ export async function POST(req: NextRequest) {
         let tier: string = "free"
 
         // Map your price IDs to tiers here
-        if (planId === process.env.STRIPE_PRICE_BASIC) tier = "basic"
-        else if (planId === process.env.STRIPE_PRICE_PRO) tier = "pro"
+        const proMonthlyId = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY
+        const proYearlyId = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY
+
+        if (planId === proMonthlyId || planId === proYearlyId) {
+          tier = "pro"
+        }
 
         const { error } = await (supabase
           .from("profiles") as any)
