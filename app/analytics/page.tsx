@@ -6,6 +6,9 @@ import Link from 'next/link'
 import { createBrowserSupabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
+// Force dynamic rendering to avoid build-time Supabase client creation
+export const dynamic = 'force-dynamic'
+
 interface Analytics {
   totalConversations: number
   totalMessages: number
