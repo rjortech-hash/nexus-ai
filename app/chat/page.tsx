@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send, Brain, Loader2, User, Sparkles, Home, Trash2, LogOut, Save, Menu, X } from 'lucide-react'
 import Link from 'next/link'
-import { createSupabaseClient } from '@/lib/supabase'
+import { createBrowserSupabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
 
@@ -64,7 +64,7 @@ export default function ChatPage() {
   const [isSaving, setIsSaving] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
-  const supabase = createSupabaseClient()
+  const supabase = createBrowserSupabase()
 
   useEffect(() => {
     const checkUser = async () => {

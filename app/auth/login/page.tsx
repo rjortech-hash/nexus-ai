@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { createSupabaseClient } from '@/lib/supabase'
+import { createBrowserSupabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Brain, Mail, Lock, User, ArrowRight, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 
 export default function LoginPage() {
+  const supabase = createBrowserSupabase()
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -15,7 +16,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
-  const supabase = createSupabaseClient()
+  
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()

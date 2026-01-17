@@ -1,6 +1,10 @@
-import { createBrowserClient, createServerClient } from '@supabase/ssr' 
-import type { Database } from './types' // adjust path if needed
+// lib/supabase.ts
+import { createBrowserClient, createServerClient } from '@supabase/ssr'
+import type { Database } from '@/lib/supabase'
 
+// -----------------------------
+// Database Type
+// -----------------------------
 export type Database = {
   public: {
     Tables: {
@@ -8,6 +12,7 @@ export type Database = {
         Row: {
           id: string
           email: string
+          stripe_customer_id?: string | null
           full_name: string | null
           subscription_tier: string
           created_at: string
@@ -17,13 +22,32 @@ export type Database = {
           id: string
           email: string
           full_name?: string | null
+          stripe_customer_id?: string | null
           subscription_tier?: string
         }
         Update: {
           full_name?: string | null
+          stripe_customer_id?: string | null
           subscription_tier?: string
         }
       }
+      subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          stripe_customer_id: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          stripe_customer_id: string
+        }
+        Update: {
+          stripe_customer_id?: string
+        }
+      }
+
       conversations: {
         Row: {
           id: string
@@ -45,6 +69,7 @@ export type Database = {
           messages?: any[]
         }
       }
+
       goals: {
         Row: {
           id: string
@@ -77,27 +102,26 @@ export type Database = {
   }
 }
 
-// Client-side Supabase client
-export const createSupabaseClient = () => {
-  return createBrowserClient<Database>( 
-    process.env.NEXT_PUBLIC_SUPABASE_URL!, 
+// -----------------------------
+// Client-side Supabase
+// -----------------------------
+export function createBrowserSupabase() {
+  return createBrowserClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-   ) 
-  } 
-  
-// Server-side Supabase client (API routes, server components)
- export const createSupabaseServerClient = () => {
-  const cookieStore = cookies()
-  
+  )
+}
+
+// -----------------------------
+// Server-side Supabase
+// -----------------------------
+export function createServerSupabase() {
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-     { 
-      cookies: {
-        get(name: string) {
-           return cookieStore.get(name)?.value 
-        } 
-      } 
-    } 
-  ) 
+    { cookies: {} }
+  )
 }
+
+// Legacy alias
+export const createSupabaseServerClient = createServerSupabase

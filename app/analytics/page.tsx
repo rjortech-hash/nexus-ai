@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Brain, MessageSquare, TrendingUp, Users, Calendar } from 'lucide-react'
 import Link from 'next/link'
-import { createSupabaseClient } from '@/lib/supabase'
+import { createBrowserSupabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
 interface Analytics {
@@ -44,7 +44,7 @@ export default function AnalyticsPage() {
   const [expertUsage, setExpertUsage] = useState<Record<string, number>>({})
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createSupabaseClient()
+  const supabase = createBrowserSupabase()
   const router = useRouter()
 
   useEffect(() => {

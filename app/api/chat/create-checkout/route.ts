@@ -1,81 +1,103 @@
-import { NextRequest, NextResponse } from 'next/server'
-import Stripe from 'stripe'
-import { createSupabaseServerClient } from '@/lib/supabase'
+import { NextRequest, NextResponse } from "next/server"
+import Stripe from "stripe"
+import { createServerSupabase, Database } from "@/lib/supabase"
 
-// Use default API version from installed Stripe package
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2022-11-15',
+  apiVersion: "2022-11-15",
 })
+
+export const runtime = "nodejs"
 
 export async function POST(req: NextRequest) {
   try {
-    const { priceId, userId } = await req.json()
+    const { userId, priceId } = await req.json()
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!userId || !priceId) {
+      return NextResponse.json(
+        { error: "Missing userId or priceId" },
+        { status: 400 }
+      )
     }
 
-    const supabase = createSupabaseServerClient()
+    const supabase = createServerSupabase()
 
-    // Get or create Stripe customer
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('email')
-      .eq('id', userId)
-      .single()
+    // -------------------------------
+    // Fetch user profile
+    // -------------------------------
+    type ProfileRow = { email: string | null }
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("email")
+      .eq("id", userId)
+      .maybeSingle<ProfileRow>()
 
-    if (!profile) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    if (profileError || !profile?.email) {
+      return NextResponse.json(
+        { error: "User not found or missing email" },
+        { status: 404 }
+      )
     }
+
+    // -------------------------------
+    // Fetch subscription
+    // -------------------------------
+    type SubscriptionRow = { stripe_customer_id: string | null }
+    const { data: subscription } = await supabase
+      .from("subscriptions")
+      .select("stripe_customer_id")
+      .eq("user_id", userId)
+      .maybeSingle<SubscriptionRow>()
 
     let customerId: string
-
-    // Check if customer exists
-    const { data: subscription } = await supabase
-      .from('subscriptions')
-      .select('stripe_customer_id')
-      .eq('user_id', userId)
-      .single()
 
     if (subscription?.stripe_customer_id) {
       customerId = subscription.stripe_customer_id
     } else {
+      // -------------------------------
       // Create new Stripe customer
+      // -------------------------------
       const customer = await stripe.customers.create({
         email: profile.email,
-        metadata: {
-          supabase_user_id: userId,
-        },
+        metadata: { supabase_user_id: userId },
       })
       customerId = customer.id
 
-      // Save customer ID
-      await supabase.from('subscriptions').upsert({
-        user_id: userId,
-        stripe_customer_id: customerId,
-      })
+      // -------------------------------
+      // Save customer ID in Supabase
+      // -------------------------------
+      const { error: insertError } = await supabase
+        .from("subscriptions")
+        .insert({
+          user_id: userId,
+          stripe_customer_id: customerId,
+        } as Database["public"]["Tables"]["subscriptions"]["Insert"])
+
+      if (insertError) {
+        console.error("Error inserting subscription:", insertError)
+        return NextResponse.json(
+          { error: "Failed to save subscription" },
+          { status: 500 }
+        )
+      }
     }
 
-    // Create checkout session
+    // -------------------------------
+    // Create Stripe Checkout session
+    // -------------------------------
     const session = await stripe.checkout.sessions.create({
-     customer: customerId,
-     line_items: [
-       {
-         price: priceId,
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      success_url: `${req.headers.get('origin')}/chat?success=true`,
-      cancel_url: `${req.headers.get('origin')}/pricing?canceled=true`,
-      metadata: {
-        user_id: userId,
-      },
+      mode: "subscription",
+      customer: customerId,
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
     })
 
-    return NextResponse.json({ sessionId: session.id })
+    return NextResponse.json({ url: session.url })
   } catch (error: any) {
-    console.error('Stripe error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error("Error in create-checkout route:", error)
+    return NextResponse.json(
+      { error: error.message || "Internal Server Error" },
+      { status: 500 }
+    )
   }
 }
