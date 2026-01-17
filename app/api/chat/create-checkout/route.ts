@@ -70,8 +70,8 @@ export async function POST(req: NextRequest) {
         .insert({
           user_id: userId,
           stripe_customer_id: customerId,
-        } as Database["public"]["Tables"]["subscriptions"]["Insert"])
-
+        } as any)
+        
       if (insertError) {
         console.error("Error inserting subscription:", insertError)
         return NextResponse.json(

@@ -36,11 +36,11 @@ export async function POST(req: NextRequest) {
         const customerId = subscription.customer as string
 
         // Map Stripe subscription to Supabase profile
-        const { data: profile } = await supabase
-          .from("profiles")
+        const { data: profile } = await (supabase
+          .from("profiles") as any)
           .select("id")
           .eq("stripe_customer_id", customerId)
-          .maybeSingle<{ id: string }>()
+          .maybeSingle()
 
         if (!profile?.id) {
           console.warn("No Supabase profile found for customer:", customerId)
@@ -55,11 +55,9 @@ export async function POST(req: NextRequest) {
         if (planId === process.env.STRIPE_PRICE_BASIC) tier = "basic"
         else if (planId === process.env.STRIPE_PRICE_PRO) tier = "pro"
 
-        type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"]
-
-        const { error } = await supabase
-          .from("profiles")
-          .update<ProfileUpdate>({ subscription_tier: tier })
+        const { error } = await (supabase
+          .from("profiles") as any)
+          .update({ subscription_tier: tier })
           .eq("id", profile.id)
 
         if (error) {

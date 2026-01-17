@@ -1,6 +1,5 @@
 // lib/supabase.ts
 import { createBrowserClient, createServerClient } from '@supabase/ssr'
-import type { Database } from '@/lib/supabase'
 
 // -----------------------------
 // Database Type
@@ -40,11 +39,16 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          id?: string
           user_id: string
           stripe_customer_id: string
+          created_at?: string
+          updated_at?: string
         }
         Update: {
+          user_id?: string
           stripe_customer_id?: string
+          updated_at?: string
         }
       }
 
@@ -88,6 +92,8 @@ export type Database = {
           title: string
           description?: string | null
           expert_id?: string | null
+          status?: string
+          progress?: number
           target_date?: string | null
         }
         Update: {
@@ -119,7 +125,12 @@ export function createServerSupabase() {
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: {} }
+    {
+      cookies: {
+        getAll: () => [],
+        setAll: () => {},
+      },
+    }
   )
 }
 

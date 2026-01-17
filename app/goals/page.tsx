@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Brain, Plus, Trash2, Check, Target, TrendingUp } from 'lucide-react'
+import { Brain, Plus, Trash2, Check, Target } from 'lucide-react'
 import Link from 'next/link'
-import { createSupabaseClient } from '@/lib/supabase'
+import { createBrowserSupabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
 interface Goal {
@@ -35,7 +35,7 @@ export default function GoalsPage() {
   })
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createSupabaseClient()
+  const supabase = createBrowserSupabase()
   const router = useRouter()
 
   useEffect(() => {
@@ -69,8 +69,8 @@ export default function GoalsPage() {
     e.preventDefault()
     if (!user) return
 
-    const { data, error } = await supabase
-      .from('goals')
+    const { data, error } = await (supabase
+      .from('goals') as any)
       .insert({
         user_id: user.id,
         ...newGoal,
@@ -86,8 +86,8 @@ export default function GoalsPage() {
   }
 
   const handleUpdateProgress = async (goalId: string, newProgress: number) => {
-    await supabase
-      .from('goals')
+    await (supabase
+      .from('goals') as any)
       .update({ progress: newProgress })
       .eq('id', goalId)
 
@@ -96,14 +96,14 @@ export default function GoalsPage() {
 
   const handleDeleteGoal = async (goalId: string) => {
     if (confirm('Are you sure you want to delete this goal?')) {
-      await supabase.from('goals').delete().eq('id', goalId)
+      await (supabase.from('goals') as any).delete().eq('id', goalId)
       setGoals(goals.filter(g => g.id !== goalId))
     }
   }
 
   const handleCompleteGoal = async (goalId: string) => {
-    await supabase
-      .from('goals')
+    await (supabase
+      .from('goals') as any)
       .update({ status: 'completed', progress: 100 })
       .eq('id', goalId)
 

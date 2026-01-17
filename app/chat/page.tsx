@@ -81,8 +81,8 @@ export default function ChatPage() {
 
   const loadConversation = async (userId: string, expertId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('conversations')
+      const { data, error } = await (supabase
+        .from('conversations') as any)
         .select('*')
         .eq('user_id', userId)
         .eq('expert_id', expertId)
@@ -106,16 +106,16 @@ export default function ChatPage() {
 
     try {
       if (conversationId) {
-        await supabase
-          .from('conversations')
+        await (supabase
+          .from('conversations') as any)
           .update({
             messages: newMessages,
             updated_at: new Date().toISOString(),
           })
           .eq('id', conversationId)
       } else {
-        const { data, error } = await supabase
-          .from('conversations')
+        const { data, error } = await (supabase
+          .from('conversations') as any)
           .insert({
             user_id: user.id,
             expert_id: selectedExpert.id,
@@ -130,7 +130,7 @@ export default function ChatPage() {
         }
       }
 
-      await supabase.from('usage_analytics').insert({
+      await (supabase.from('usage_analytics') as any).insert({
         user_id: user.id,
         event_type: 'message_sent',
         event_data: { expert_id: selectedExpert.id },

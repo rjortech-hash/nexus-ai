@@ -1,25 +1,40 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { PLANS } from "@/lib/plans"
+import { createBrowserSupabase } from "@/lib/supabase"
 
 export default function PricingPage() {
   const [loading, setLoading] = useState<string | null>(null)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+
+  useEffect(() => {
+    const getUser = async () => {
+      const supabase = createBrowserSupabase()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.email) {
+        setUserEmail(user.email)
+      }
+    }
+    getUser()
+  }, [])
 
   const subscribe = async (priceId: string) => {
     setLoading(priceId)
 
-    const res = await fetch("/api/stripe/checkout", {
+    const res = await fetch("/api/chat/stripe/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         priceId,
-        customerEmail: "user@email.com", // replace later with auth user
+        customerEmail: userEmail,
       }),
     })
 
     const data = await res.json()
-    window.location.href = data.url
+    if (data.url) {
+      window.location.href = data.url
+    }
   }
 
   return (
