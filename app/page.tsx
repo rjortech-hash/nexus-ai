@@ -26,11 +26,18 @@ export default function LandingPage() {
             <Brain className="w-8 h-8 text-purple-500" />
             <span className="text-2xl font-bold gradient-text">NEXUS</span>
           </div>
-          <Link href="/chat">
-            <button className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-2 rounded-full font-semibold hover:scale-105 transition-transform">
-              Launch App
-            </button>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/pricing">
+              <button className="px-4 py-2 text-gray-300 hover:text-white transition-colors">
+                Pricing
+              </button>
+            </Link>
+            <Link href="/chat">
+              <button className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-2 rounded-full font-semibold hover:scale-105 transition-transform">
+                Launch App
+              </button>
+            </Link>
+          </div>
         </div>
       </nav>
 
