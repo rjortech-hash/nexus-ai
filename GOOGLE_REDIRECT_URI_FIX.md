@@ -19,18 +19,31 @@ You need to add your **exact Supabase callback URL** to Google Cloud Console.
    https://[your-project-ref].supabase.co/auth/v1/callback
    ```
 
-### Step 2: Add It to Google Cloud Console
+### Step 2: Add It to Google Cloud Console - IMPORTANT!
 
 1. Go to https://console.cloud.google.com/apis/credentials
 2. Find your OAuth 2.0 Client ID (the one you're using for NEXUS AI)
 3. Click on it to edit
-4. Scroll down to **"Authorized redirect URIs"**
-5. Click **"+ ADD URI"**
-6. Paste your Supabase callback URL **EXACTLY** as copied
+
+**CRITICAL: There are TWO sections - make sure you add to the RIGHT one!**
+
+4. **SKIP the "Authorized JavaScript origins" section** - this is for your app's domain only
+   - ❌ DON'T add the Supabase URL here (it will give "Invalid Origin" error)
+
+5. **Scroll down to "Authorized redirect URIs"** - this is where the Supabase callback goes
+   - ✅ This section allows paths like `/auth/v1/callback`
+
+6. Click **"+ ADD URI"** in the **"Authorized redirect URIs"** section
+7. Paste your Supabase callback URL **EXACTLY** as copied (from Step 1):
+   ```
+   https://[your-project-ref].supabase.co/auth/v1/callback
+   ```
    - Make sure there's no trailing slash
    - Make sure it's `https://` (not `http://`)
    - Make sure the project ref is correct
-7. Click **"SAVE"** at the bottom
+   - Use the EXACT URL you copied from Supabase Dashboard
+
+8. Click **"SAVE"** at the bottom
 
 ### Step 3: Wait and Test
 
@@ -41,14 +54,43 @@ You need to add your **exact Supabase callback URL** to Google Cloud Console.
 
 ## Common Mistakes
 
-### ❌ Wrong - Using your app's URL:
+### ❌ MISTAKE #1: Adding to the wrong section
 ```
-https://your-app.vercel.app/auth/callback  ← This is your app, not Supabase!
+"Authorized JavaScript origins" section:
+  https://[project].supabase.co/auth/v1/callback  ← WRONG SECTION!
+  ❌ Error: "Invalid Origin: URIs must not contain a path"
 ```
 
-### ✅ Correct - Using Supabase's callback URL:
+### ❌ MISTAKE #2: Using your app's URL instead of Supabase
 ```
-https://[your-project-ref].supabase.co/auth/v1/callback  ← This is what Google needs!
+"Authorized redirect URIs" section:
+  https://your-app.vercel.app/auth/callback  ← This is your app, not Supabase!
+  ❌ Error: redirect_uri_mismatch
+```
+
+### ✅ CORRECT: Supabase callback URL in redirect URIs section
+```
+"Authorized redirect URIs" section:
+  https://[your-project-ref].supabase.co/auth/v1/callback  ← Perfect!
+  ✅ This will work!
+```
+
+## Where Each URL Goes
+
+### Section 1: "Authorized JavaScript origins" (NO paths allowed)
+Add your **app's domain** here:
+```
+✅ https://your-app.vercel.app
+✅ http://localhost:3000
+❌ https://[project].supabase.co/auth/v1/callback  ← NO! Wrong section!
+```
+
+### Section 2: "Authorized redirect URIs" (paths ARE allowed)
+Add your **Supabase callback** here:
+```
+✅ https://[your-project-ref].supabase.co/auth/v1/callback
+✅ http://localhost:54321/auth/v1/callback
+❌ https://your-app.vercel.app  ← This goes in JavaScript origins!
 ```
 
 ## Why This Happens
