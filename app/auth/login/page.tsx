@@ -238,17 +238,37 @@ export default function LoginPage() {
             </button>
 
             <div className="mt-6 text-center">
-              <button
-                onClick={() => {
-                  setIsLogin(!isLogin)
-                  setError('')
-                }}
-                className="text-sm text-purple-400 hover:text-purple-300 transition-colors font-medium"
-              >
-                {isLogin
-                  ? "Don't have an account? Sign up"
-                  : 'Already have an account? Sign in'}
-              </button>
+              {isLogin ? (
+                <div className="space-y-3">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl blur opacity-30"></div>
+                    <button
+                      onClick={() => {
+                        setIsLogin(false)
+                        setError('')
+                      }}
+                      className="relative w-full bg-gradient-to-r from-green-600 to-emerald-600 py-3.5 px-6 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-green-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                    >
+                      <Sparkles className="w-5 h-5" />
+                      Create New Account
+                      <ArrowRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    New to NEXUS? Start your free trial today
+                  </p>
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    setIsLogin(true)
+                    setError('')
+                  }}
+                  className="text-sm text-purple-400 hover:text-purple-300 transition-colors font-medium"
+                >
+                  Already have an account? Sign in
+                </button>
+              )}
             </div>
           </div>
         </motion.div>
