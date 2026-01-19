@@ -10,11 +10,12 @@ export default function LandingPage() {
   const [email, setEmail] = useState('')
 
   const experts = [
+    { name: 'Clinical Psychology', icon: '🧠', color: 'from-purple-500 to-pink-500' },
     { name: 'Business Strategy', icon: '💼', color: 'from-blue-500 to-cyan-500' },
-    { name: 'Mental Health', icon: '🧠', color: 'from-purple-500 to-pink-500' },
-    { name: 'Relationships', icon: '❤️', color: 'from-red-500 to-orange-500' },
-    { name: 'Fitness', icon: '💪', color: 'from-green-500 to-emerald-500' },
-    { name: 'Creative', icon: '🎨', color: 'from-yellow-500 to-amber-500' },
+    { name: 'Wellness & Fitness', icon: '💪', color: 'from-green-500 to-emerald-500' },
+    { name: 'Creative Direction', icon: '🎨', color: 'from-yellow-500 to-amber-500' },
+    { name: 'Financial Planning', icon: '💰', color: 'from-emerald-500 to-teal-500' },
+    { name: 'Career Development', icon: '🚀', color: 'from-indigo-500 to-purple-500' },
   ]
 
   return (
@@ -82,7 +83,7 @@ export default function LandingPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="mt-20 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-5xl mx-auto"
+            className="mt-20 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-6xl mx-auto"
           >
             {experts.map((expert, i) => (
               <motion.div
@@ -151,7 +152,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-white/10">
         <div className="max-w-6xl mx-auto text-center text-gray-400">
-          <p>&copy; 2026 NEXUS AI. Built with Claude by Anthropic.</p>
+          <p>&copy; 2026 NEXUS AI. Built with Claude by Anthropic & RjoRtech</p>
         </div>
       </footer>
     </div>
