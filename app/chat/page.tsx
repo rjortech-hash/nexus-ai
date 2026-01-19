@@ -51,6 +51,20 @@ const experts: Expert[] = [
     specialty: 'Creative Direction',
     avatar: '🎨',
     description: 'Award-winning creative director helping artists find their unique voice.'
+  },
+  {
+    id: 'finance',
+    name: 'Diana Park',
+    specialty: 'Financial Planning',
+    avatar: '💰',
+    description: 'CFP with 12 years optimizing wealth building, retirement planning, and smart investing.'
+  },
+  {
+    id: 'career',
+    name: 'Jordan Mills',
+    specialty: 'Career Development',
+    avatar: '🚀',
+    description: 'Executive coach specializing in leadership growth, career transitions, and negotiation.'
   }
 ]
 
@@ -327,7 +341,7 @@ export default function ChatPage() {
                 <Sparkles className="w-6 h-6 text-purple-400" />
                 Choose Your Advisor
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {experts.map(expert => (
                   <motion.button
                     key={expert.id}
