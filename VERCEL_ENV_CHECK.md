@@ -31,13 +31,13 @@ vercel env rm STRIPE_WEBHOOK_SECRE development
 
 # Add the correctly named variable
 vercel env add STRIPE_WEBHOOK_SECRET production
-# Enter value: whsec_dk3SFH7KizT6nd5N1YrIS2c0bWm1GTTN
+# Enter value: [YOUR_STRIPE_WEBHOOK_SECRET]
 
 vercel env add STRIPE_WEBHOOK_SECRET preview
-# Enter value: whsec_dk3SFH7KizT6nd5N1YrIS2c0bWm1GTTN
+# Enter value: [YOUR_STRIPE_WEBHOOK_SECRET]
 
 vercel env add STRIPE_WEBHOOK_SECRET development
-# Enter value: whsec_dk3SFH7KizT6nd5N1YrIS2c0bWm1GTTN
+# Enter value: [YOUR_STRIPE_WEBHOOK_SECRET]
 ```
 
 ### 2. Missing Variable in Vercel
@@ -120,7 +120,7 @@ cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,   // ⚠️ NOT set in
 # Fix webhook secret typo
 vercel env rm STRIPE_WEBHOOK_SECRE production preview development
 vercel env add STRIPE_WEBHOOK_SECRET
-# When prompted, add to all environments with value: whsec_dk3SFH7KizT6nd5N1YrIS2c0bWm1GTTN
+# When prompted, add to all environments with your webhook secret from Stripe Dashboard
 
 # Add app URL
 vercel env add NEXT_PUBLIC_APP_URL

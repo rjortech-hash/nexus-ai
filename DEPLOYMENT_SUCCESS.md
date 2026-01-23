@@ -20,10 +20,10 @@
 
 ✅ NEXT_PUBLIC_SUPABASE_URL=https://vyadtzhurbvpjuevwghb.supabase.co
 ✅ NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_nvJ... (updated key)
-✅ ANTHROPIC_API_KEY=sk-ant-api03-... (configured)
-✅ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_51SfL... (configured)
-✅ STRIPE_SECRET_KEY=sk_live_51SfL... (configured)
-✅ STRIPE_WEBHOOK_SECRET=whsec_dk3SFH7... (fixed typo)
+✅ ANTHROPIC_API_KEY=[CONFIGURED]
+✅ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=[CONFIGURED]
+✅ STRIPE_SECRET_KEY=[CONFIGURED]
+✅ STRIPE_WEBHOOK_SECRET=[CONFIGURED] (fixed typo)
 ✅ NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY=price_1SqiPx... (configured)
 ✅ NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY=price_1SqiSI... (configured)
 ✅ NEXT_PUBLIC_APP_URL=https://nexus-ai-eta-three.vercel.app (added)
