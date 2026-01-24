@@ -197,18 +197,22 @@ export default function ChatPage() {
         })
       })
 
-      if (!response.ok) throw new Error('Failed to get response')
-
       const data = await response.json()
+
+      if (!response.ok) {
+        console.error('API Error Response:', data)
+        throw new Error(data.error || 'Failed to get response')
+      }
+
       const updatedMessages = [...newMessages, { role: 'assistant' as const, content: data.message }]
       setMessages(updatedMessages)
-      
+
       await saveConversation(updatedMessages)
-    } catch (error) {
-      console.error('Error:', error)
+    } catch (error: any) {
+      console.error('Chat Error:', error)
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'I apologize, but I encountered an error. Please try again.'
+        content: `I apologize, but I encountered an error: ${error.message || 'Unknown error'}. Please try again.`
       }])
     } finally {
       setIsLoading(false)

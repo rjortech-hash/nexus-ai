@@ -70,37 +70,87 @@ const expertPrompts: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, expert } = await req.json() as { messages: Message[], expert: Expert }
+    const body = await req.json()
+    const { messages, expert } = body as { messages: Message[], expert: Expert }
+
+    console.log('Chat API called with:', {
+      messagesCount: messages?.length,
+      expertId: expert?.id,
+      hasApiKey: !!process.env.ANTHROPIC_API_KEY
+    })
 
     if (!process.env.ANTHROPIC_API_KEY) {
+      console.error('ANTHROPIC_API_KEY is not set')
       return NextResponse.json(
         { error: 'API key not configured. Please set ANTHROPIC_API_KEY in your .env.local file.' },
         { status: 500 }
       )
     }
 
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      console.error('Invalid messages:', messages)
+      return NextResponse.json(
+        { error: 'Messages are required and must be a non-empty array' },
+        { status: 400 }
+      )
+    }
+
+    if (!expert || !expert.id) {
+      console.error('Invalid expert:', expert)
+      return NextResponse.json(
+        { error: 'Expert is required' },
+        { status: 400 }
+      )
+    }
+
     const systemPrompt = expertPrompts[expert.id] || expertPrompts.therapist
+
+    // Filter to only include valid user/assistant messages
+    const validMessages = messages.filter(m =>
+      m && m.role && m.content && (m.role === 'user' || m.role === 'assistant')
+    )
+
+    if (validMessages.length === 0 || validMessages[0].role !== 'user') {
+      console.error('Messages must start with user role:', validMessages)
+      return NextResponse.json(
+        { error: 'Conversation must start with a user message' },
+        { status: 400 }
+      )
+    }
+
+    console.log('Calling Anthropic API with model: claude-sonnet-4-20250514')
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
       system: systemPrompt,
-      messages: messages.map(m => ({
+      messages: validMessages.map(m => ({
         role: m.role,
         content: m.content
       }))
     })
 
-    const assistantMessage = response.content[0].type === 'text' 
-      ? response.content[0].text 
+    console.log('Anthropic API response received:', {
+      contentType: response.content[0]?.type,
+      stopReason: response.stop_reason
+    })
+
+    const assistantMessage = response.content[0].type === 'text'
+      ? response.content[0].text
       : 'I apologize, but I had trouble generating a response.'
 
     return NextResponse.json({ message: assistantMessage })
   } catch (error: any) {
-    console.error('API Error:', error)
+    console.error('API Error:', {
+      name: error.name,
+      message: error.message,
+      status: error.status,
+      error: error.error,
+      stack: error.stack
+    })
     return NextResponse.json(
       { error: error.message || 'Failed to process request' },
-      { status: 500 }
+      { status: error.status || 500 }
     )
   }
 }
