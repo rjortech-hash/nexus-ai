@@ -5,9 +5,11 @@ import { motion } from 'framer-motion'
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Brain, Sparkles, Shield, Users, ArrowRight, Star } from 'lucide-react'
 import Link from 'next/link'
+import DemoPlayer from '@/components/DemoPlayer'
 
 export default function LandingPage() {
   const [email, setEmail] = useState('')
+  const [showDemo, setShowDemo] = useState(false)
 
   const experts = [
     { name: 'Clinical Psychology', icon: '🧠', color: 'from-purple-500 to-pink-500' },
@@ -67,7 +69,10 @@ export default function LandingPage() {
                   <ArrowRight className="w-5 h-5" />
                 </button>
               </Link>
-              <button className="border-2 border-purple-500 px-8 py-4 rounded-full text-lg font-semibold hover:bg-purple-500/10 transition-colors">
+              <button
+                onClick={() => setShowDemo(true)}
+                className="border-2 border-purple-500 px-8 py-4 rounded-full text-lg font-semibold hover:bg-purple-500/10 transition-colors"
+              >
                 Watch Demo
               </button>
             </div>
@@ -155,6 +160,9 @@ export default function LandingPage() {
           <p>&copy; 2026 NEXUS AI. Built with Claude by Anthropic & RjoRtech</p>
         </div>
       </footer>
+
+      {/* Demo Player Modal */}
+      <DemoPlayer isOpen={showDemo} onClose={() => setShowDemo(false)} />
     </div>
   )
 }
